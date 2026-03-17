@@ -16,14 +16,14 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     errorElement: <NotFoundPage />,
     children: [
-      {
-        index: true,
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <div>Hello Test</div>
-          </Suspense>
-        ),
-      },
+      // {
+      //   index: true,
+      //   element: (
+      //     <Suspense fallback={<PageLoader />}>
+      //       <HomePage />
+      //     </Suspense>
+      //   ),
+      // },
       // {
       //   path: 'about',
       //   element: (
