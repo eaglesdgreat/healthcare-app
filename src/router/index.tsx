@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
-import PageLoader from '@/components/PageLoader'
+// import PageLoader from '@/components/PageLoader'
 import RootLayout from '@/layout/RootLayout'
 import NotFoundPage from '@/views/NotFoundPage'
 
