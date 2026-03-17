@@ -10,6 +10,8 @@ import NotFoundPage from '@/views/NotFoundPage'
 // const ProductsPage = lazy(() => import('../pages/ProductsPage'));
 // const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'));
 
+console.log(lazy)
+
 export const router = createBrowserRouter([
   {
     path: '/',

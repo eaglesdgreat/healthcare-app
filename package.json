@@ -17,7 +17,7 @@
     "test:e2e": "playwright test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepare": "husky"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
