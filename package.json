@@ -19,14 +19,6 @@
     "build-storybook": "storybook build",
     "prepare": "husky install"
   },
-  "dependencies": {
-    "@tanstack/react-query": "^5.90.21",
-    "date-fns": "^4.1.0",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "react-router-dom": "^7.13.1",
-    "zustand": "^5.0.12"
-  },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "eslint --fix",
@@ -39,6 +31,14 @@
     "*.{json,md}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.21",
+    "date-fns": "^4.1.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-router-dom": "^7.13.1",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
