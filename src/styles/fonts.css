@@ -1,0 +1,74 @@
+/* Versatylo Rounded Font */
+@font-face {
+  font-family: 'Versatylo Rounded';
+  src: url('/src/assets/fonts/VersatyloRounded/VersatyloRoundedPersonalUseOnly.ttf')
+    format('ttf');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* @font-face {
+  font-family: 'Versatylo Rounded';
+  src: url('/src/assets/fonts/VersatyloRounded/VersatyloRounded-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Versatylo Rounded';
+  src: url('/src/assets/fonts/VersatyloRounded/VersatyloRounded-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Versatylo Rounded';
+  src: url('/src/assets/fonts/VersatyloRounded/VersatyloRounded-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+} */
+
+/* Outfits Font */
+@font-face {
+  font-family: Outfit;
+  src: url('/src/assets/fonts/Outfits/Outfit-Regular.ttf') format('ttf');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Outfit;
+  src: url('/src/assets/fonts/Outfits/Outfit-Medium.ttf') format('ttf');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Outfit;
+  src: url('/src/assets/fonts/Outfits/Outfit-SemiBold.ttf') format('ttf');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Outfit;
+  src: url('/src/assets/fonts/Outfits/Outfit-Bold.ttf') format('ttf');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: Outfit;
+  src: url('/src/assets/fonts/Outfits/Outfit-ExtraBold.ttf') format('ttf');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
