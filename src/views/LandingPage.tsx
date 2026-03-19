@@ -1,7 +1,23 @@
+import { useNavigate } from 'react-router-dom'
+import { useEffect } from 'react'
 import MedicalIcon from '@/assets/images/svgs/medical.svg?react'
 import Title from '@/components/Title'
 
 const LandingPage = () => {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Set the timeout
+    const timeoutId = setTimeout(() => {
+      navigate('/login/options')
+    }, 3000)
+
+    // Cleanup function to clear the timeout
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  })
+
   return (
     <div className="w-full min-h-screen flex flex-col justify-end items-center gap-40">
       <Title animated className="!font-normal">
