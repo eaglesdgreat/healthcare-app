@@ -1,11 +1,13 @@
 import { createBrowserRouter } from 'react-router-dom'
-// import { lazy, Suspense } from 'react'
-// import PageLoader from '@/components/PageLoader'
+import { Suspense } from 'react'
+import PageLoader from '@/components/PageLoader'
+import AuthLayout from '@/layout/AuthLayout'
 import RootLayout from '@/layout/RootLayout'
+import LandingPage from '@/views/LandingPage'
 import NotFoundPage from '@/views/NotFoundPage'
 
 // Lazy load pages for better performance
-// const HomePage = lazy(() => import('../pages/HomePage'));
+// const LandingPage = lazy(() => import('@/views/LandingPage'))
 // const AboutPage = lazy(() => import('../pages/AboutPage'));
 // const ProductsPage = lazy(() => import('../pages/ProductsPage'));
 // const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'));
@@ -13,17 +15,17 @@ import NotFoundPage from '@/views/NotFoundPage'
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <RootLayout />,
+    element: <AuthLayout />,
     errorElement: <NotFoundPage />,
     children: [
-      // {
-      //   index: true,
-      //   element: (
-      //     <Suspense fallback={<PageLoader />}>
-      //       <HomePage />
-      //     </Suspense>
-      //   ),
-      // },
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <LandingPage />
+          </Suspense>
+        ),
+      },
       // {
       //   path: 'about',
       //   element: (
@@ -54,5 +56,11 @@ export const router = createBrowserRouter([
       //   ],
       // },
     ],
+  },
+  {
+    path: '/appointments',
+    element: <RootLayout />,
+    errorElement: <NotFoundPage />,
+    children: [],
   },
 ])

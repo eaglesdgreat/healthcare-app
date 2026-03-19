@@ -1,72 +1,46 @@
 @import url('./styles/fonts.css');
+@import url('tailwindcss');
 
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --color-primary: #6549d5;
+  --color-secondary: #e33fa1;
+  --color-secondary-2: #fb5343;
+  --color-neutral: #0f0f11;
+  --color-background: #060606;
+  --color-text: #acacac;
+  --font-versatylo: 'Versatylo Rounded', sans-serif;
+  --font-outfit: 'Outfit', sans-serif;
+  --background-image-title-gradient: linear-gradient(
+    135deg,
+    #6549d5,
+    #e33fa1,
+    #fb5343
+  );
 
-@layer base {
-  html {
-    @apply antialiased;
-  }
-  
-  body {
-    @apply bg-white text-neutral font-outfits;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-versatylo font-semibold;
+  /* This variable creates the 'animate-gradient' utility */
+  --animate-gradient: gradient 3s ease infinite;
+
+  @keyframes gradient {
+    0%,
+    100% {
+      background-position: left center;
+    }
+
+    50% {
+      background-position: right center;
+    }
   }
 }
 
-@layer components {
-  // Optional: Create reusable text styles 
-  .heading-1 {
-    @apply font-versatylo text-4xl md:text-5xl lg:text-6xl font-bold text-neutral;
-  }
-  
-  .heading-2 {
-    @apply font-versatylo text-3xl md:text-4xl font-semibold text-neutral;
-  }
-  
-  .heading-3 {
-    @apply font-versatylo text-2xl md:text-3xl font-semibold text-neutral;
-  }
-  
-  .body-large {
-    @apply font-outfits text-lg text-neutral;
-  }
-  
-  .body-regular {
-    @apply font-outfits text-base text-neutral;
-  }
-  
-  .body-small {
-    @apply font-outfits text-sm text-neutral;
-  }
-} */
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 @layer base {
-  /* CSS Variables for easy theme access */
-  :root {
-    /* Colors as CSS variables */
-    --color-primary: #6549d5;
-    --color-secondary: #e33fa1;
-    --color-secondary-2: #fb5343;
-    --color-neutral: #0f0f11;
-    --color-white: #fff;
-    --color-background: #060606;
-    --color-text: #acacac;
-    --color-border: #fff;
-
-    /* Gradient for titles */
-    --gradient-title: linear-gradient(135deg, #6549d5, #e33fa1, #fb5343);
+  /* Base HTML styles */
+  html,
+  body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
   }
 
-  /* Base HTML styles */
   html {
     @apply bg-background text-text;
 
@@ -79,22 +53,23 @@
 
   /* Gradient text utility */
   .text-gradient {
-    @apply bg-gradient-title bg-clip-text text-transparent;
+    @apply bg-title-gradient bg-clip-text text-transparent;
 
-    background-size: 200% 200%;
+    background-size: 100% 100%;
+    display: inline-block; /* Helps some browsers render clipping better */
   }
 
   .text-gradient-animated {
-    @apply bg-gradient-title bg-clip-text text-transparent animate-gradient;
+    @apply bg-title-gradient bg-clip-text text-transparent animate-gradient;
 
-    background-size: 200% 200%;
+    background-size: 150% 150%;
   }
 }
 
 @layer components {
   /* Example component styles */
   .heading-1 {
-    @apply text-4xl md:text-5xl lg:text-6xl font-bold;
+    @apply text-8xl md:text-[12rem] lg:text-[12rem] font-bold;
   }
 
   .heading-2 {
