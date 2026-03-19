@@ -3,6 +3,9 @@ import { Suspense } from 'react'
 import PageLoader from '@/components/PageLoader'
 import AuthLayout from '@/layout/AuthLayout'
 import RootLayout from '@/layout/RootLayout'
+import LoginOption from '@/views/auths/LoginOption'
+import SignIn from '@/views/auths/SignIn'
+import SignUp from '@/views/auths/SignUp'
 import LandingPage from '@/views/LandingPage'
 import NotFoundPage from '@/views/NotFoundPage'
 
@@ -26,14 +29,30 @@ export const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      // {
-      //   path: 'about',
-      //   element: (
-      //     <Suspense fallback={<PageLoader />}>
-      //       <AboutPage />
-      //     </Suspense>
-      //   ),
-      // },
+      {
+        path: 'login/options',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <LoginOption />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'signin',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <SignIn />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'signup',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <SignUp />
+          </Suspense>
+        ),
+      },
       // {
       //   path: 'products',
       //   children: [
