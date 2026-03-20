@@ -1,5 +1,15 @@
 @import url('./styles/fonts.css');
 @import url('tailwindcss');
+@import url('tw-animate-css');
+@import url('shadcn/tailwind.css');
+@import url('@fontsource-variable/geist');
+
+@custom-variant dark (&:is(.dark *));
+
+/* Make sure these exists! */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @theme {
   --color-primary: #6549d5;
