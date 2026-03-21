@@ -3,12 +3,10 @@
 @import url('tw-animate-css');
 @import url('shadcn/tailwind.css');
 @import url('@fontsource-variable/geist');
+@import url('tailwindcss/preflight');
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&: is(.dark *));
 
-/* Make sure these exists! */
-@tailwind base;
-@tailwind components;
 @tailwind utilities;
 
 @theme {
