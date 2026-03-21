@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import PageLoader from '@/components/PageLoader'
 import AuthLayout from '@/layout/AuthLayout'
 import RootLayout from '@/layout/RootLayout'
+import ForgetPassword from '@/views/auths/ForgetPassword'
 import LoginOption from '@/views/auths/LoginOption'
 import SignIn from '@/views/auths/SignIn'
 import SignUp from '@/views/auths/SignUp'
@@ -50,6 +51,14 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoader />}>
             <SignUp />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'forget-password',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ForgetPassword />
           </Suspense>
         ),
       },

@@ -1,7 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2, Lock, Mail } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
 import * as z from 'zod'
+import GoogleIcon from '@/assets/images/svgs/google.svg?react'
 import Title from '@/components/Title'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,9 +11,11 @@ import {
   FieldDescription,
   FieldError,
   FieldGroup,
-  FieldLabel,
+  // FieldLabel,
 } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { FloatingInput } from '@/components/ui/floating-input'
+
+// import { Input } from '@/components/ui/input'
 
 const loginSchema = z.object({
   email: z.string().email('Enter a valid medical email'),
@@ -34,14 +38,14 @@ export default function SignIn() {
   }
 
   return (
-    <div className="w-full min-h-screen flex flex-col gap-5 justify-center items-center">
-      <Title animated className="!font-normal">
+    <div className="responsive flex flex-col gap-5 md:gap-10 justify-center items-center px-5">
+      <Title animated className="font-normal!">
         Medical
       </Title>
 
       <form
         id="form-rhf-demo"
-        className="w-full px-5"
+        className="w-full"
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <FieldGroup>
@@ -50,14 +54,14 @@ export default function SignIn() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="form-rhf-demo-email">Email</FieldLabel>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-text/40" />
-                  <Input
+                {/* <FieldLabel htmlFor="form-rhf-demo-email">Email</FieldLabel> */}
+                <div className="relative bg-background">
+                  <FloatingInput
                     id="form-rhf-demo-email"
                     aria-invalid={fieldState.invalid}
                     placeholder="name@hospital.com"
-                    className="pl-10 bg-neutral border-white/10 focus:ring-1 focus:ring-primary h-12"
+                    className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
+                    label="Email"
                     {...field}
                   />
                 </div>
@@ -73,21 +77,28 @@ export default function SignIn() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor="form-rhf-demo-password">
+                {/* <FieldLabel htmlFor="form-rhf-demo-password">
                   Password
-                </FieldLabel>
+                </FieldLabel> */}
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-text/40" />
-                  <Input
+                  <FloatingInput
                     id="form-rhf-demo-password"
                     aria-invalid={fieldState.invalid}
                     type="password"
                     placeholder="••••••••"
-                    className="pl-10 bg-neutral border-white/10 focus:ring-1 focus:ring-primary h-12"
+                    label="Password"
+                    className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
                     {...field}
                   />
                 </div>
-                <FieldDescription>forget password</FieldDescription>
+                <FieldDescription className="flex justify-end">
+                  <Link
+                    to="/forget-password"
+                    className="font-outfit font-medium text-base no-underline!"
+                  >
+                    Forgot Password
+                  </Link>
+                </FieldDescription>
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -97,16 +108,40 @@ export default function SignIn() {
         </FieldGroup>
       </form>
 
-      <Field orientation="horizontal" className="px-5">
+      <Field orientation="horizontal">
         <Button
           type="submit"
           form="form-rhf-demo"
           disabled={isLoading}
-          className="w-full h-[70px] bg-title-gradient hover:opacity-90 text-white text-[24px] font-outfit font-medium transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
+          className="w-full h-17.5 bg-title-gradient hover:opacity-90 text-white text-2xl font-outfit font-medium transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
         >
           {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : 'Sign In'}
         </Button>
       </Field>
+
+      <FieldDescription className="font-outfit font-medium text-2xl mt-4">
+        Don't have an account?{' '}
+        <Link
+          to="/signup"
+          className="font-outfit font-bold text-2xl text-primary no-underline!"
+        >
+          Sign Up
+        </Link>
+      </FieldDescription>
+
+      <FieldDescription className="flex justify-center items-center font-outfit font-medium text-2xl mt-5">
+        Or Sign In With
+      </FieldDescription>
+
+      <Button
+        type="submit"
+        form="form-rhf-demo"
+        disabled={isLoading}
+        className="w-full h-17.5 relative bg-white hover:opacity-90 text-neutral text-2xl font-outfit font-medium transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
+      >
+        <GoogleIcon className="w-12.5! h-13! absolute left-4 md:left-8" />
+        Sign In with Google
+      </Button>
     </div>
   )
 }

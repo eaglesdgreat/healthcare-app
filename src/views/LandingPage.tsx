@@ -20,7 +20,7 @@ const LandingPage = () => {
 
   return (
     <div className="w-full min-h-screen flex flex-col justify-end items-center gap-40">
-      <Title animated className="!font-normal">
+      <Title animated className="font-normal! md:text-[12rem]!">
         Medical
       </Title>
       <MedicalIcon className="w-full h-auto xl:h-100" />
