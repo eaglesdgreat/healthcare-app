@@ -15,8 +15,6 @@ import {
 } from '@/components/ui/field'
 import { FloatingInput } from '@/components/ui/floating-input'
 
-// import { Input } from '@/components/ui/input'
-
 const loginSchema = z.object({
   email: z.string().email('Enter a valid medical email'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -134,9 +132,7 @@ export default function SignIn() {
       </FieldDescription>
 
       <Button
-        type="submit"
-        form="form-rhf-demo"
-        disabled={isLoading}
+        onClick={() => {}}
         className="w-full h-17.5 relative bg-white hover:opacity-90 text-neutral text-2xl font-outfit font-medium transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
       >
         <GoogleIcon className="w-12.5! h-13! absolute left-4 md:left-8" />
