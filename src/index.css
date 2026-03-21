@@ -18,6 +18,7 @@
   --color-neutral: #0f0f11;
   --color-background: #060606;
   --color-text: #acacac;
+  --color-smoke: #ffffff4d;
   --font-versatylo: 'Versatylo Rounded', sans-serif;
   --font-outfit: 'Outfit', sans-serif;
   --background-image-title-gradient: linear-gradient(
@@ -79,7 +80,7 @@
 @layer components {
   /* Example component styles */
   .heading-1 {
-    @apply text-8xl md:text-[12rem] lg:text-[12rem] font-bold;
+    @apply text-8xl font-bold;
   }
 
   .heading-2 {
@@ -88,5 +89,9 @@
 
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .responsive {
+    @apply w-full md:w-[80%] lg:w-[60%] xl:w-[40%] md:m-auto min-h-screen;
   }
 }
