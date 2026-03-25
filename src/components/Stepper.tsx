@@ -1,10 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
 import { Controller, useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
 import {
   Field,
   // FieldDescription,
@@ -12,12 +9,9 @@ import {
   FieldGroup,
   // FieldLabel,
 } from '@/components/ui/field'
+import { FloatingDatePicker } from '@/components/ui/floating-date-picker'
 import { FloatingInput } from '@/components/ui/floating-input'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { FloatingSelect } from '@/components/ui/floating-select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { registrationSchema, type RegistrationValues } from '@/lib/signup.utils'
 
@@ -25,7 +19,6 @@ export default function Stepper(props: {
   onSubmit: (data: RegistrationValues) => void
 }) {
   const [currentStep, setCurrentStep] = useState('identity')
-  const [date, setDate] = useState<Date | undefined>(undefined)
 
   const form = useForm<RegistrationValues>({
     resolver: zodResolver(registrationSchema),
@@ -132,6 +125,80 @@ export default function Stepper(props: {
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <div className="relative bg-background">
+                      <FloatingDatePicker
+                        label="Date of Birth"
+                        value={field.value ? new Date(field.value) : undefined}
+                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
+                        onChange={(date) =>
+                          field.onChange(date?.toISOString().split('T')[0])
+                        }
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} color="red" />
+                    )}
+                  </Field>
+                  // <div className="space-y-2">
+                  //   <FloatingDatePicker
+                  //     label="Date of Birth"
+                  //     value={field.value ? new Date(field.value) : undefined}
+                  //     onChange={(date) =>
+                  //       field.onChange(date?.toISOString().split('T')[0])
+                  //     }
+                  //   />
+                  //   {form.formState.errors.dob && (
+                  //     <p className="text-secondary-2 text-xs ml-2">
+                  //       {form.formState.errors.dob.message as string}
+                  //     </p>
+                  //   )}
+                  // </div>
+                )}
+              />
+
+              <Controller
+                name="bloodGroup"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
+                      <FloatingSelect
+                        label="Gender"
+                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
+                        options={[
+                          { label: 'Male', value: 'M' },
+                          { label: 'Female', value: 'F' },
+                          { label: 'Others', value: 'O' },
+                        ]}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} color="red" />
+                    )}
+                  </Field>
+                  // <div className="space-y-2">
+                  //   <FloatingSelect
+                  //     label="Blood Group"
+                  //     options={bloodGroups}
+                  //     value={field.value}
+                  //     onValueChange={field.onChange}
+                  //   />
+                  //   {form.formState.errors.bloodGroup && (
+                  //     <p className="text-secondary-2 text-xs ml-2">
+                  //       {form.formState.errors.bloodGroup.message}
+                  //     </p>
+                  //   )}
+                  // </div>
+                )}
+              />
+
+              {/* <Controller
+                name="dob"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
                       <Field data-invalid={fieldState.invalid}>
                         <div className="relative bg-background">
                           <Popover>
@@ -169,7 +236,7 @@ export default function Stepper(props: {
                     )}
                   </Field>
                 )}
-              />
+              /> */}
             </FieldGroup>
           </TabsContent>
 
