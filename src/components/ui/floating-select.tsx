@@ -29,7 +29,7 @@ export function FloatingSelect({
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger
           className={cn(
-            'peer flex h-17.5 w-full appearance-none items-center justify-between rounded-lg border-2 border-smoke/30 bg-background px-5 pb-3 pt-7 text-lg font-medium text-text outline-none focus:border-primary focus:ring-0',
+            'peer flex w-full appearance-none items-center justify-between rounded-lg border-2 border-smoke/30 bg-background px-5 pb-4 pt-6 text-lg font-medium text-text outline-none focus:border-primary focus:ring-0',
             className
           )}
         >
@@ -48,9 +48,9 @@ export function FloatingSelect({
           'absolute left-5 top-5 z-10 origin-left -translate-y-4 scale-75 transform duration-300 pointer-events-none',
           // If a value exists, keep it in the "floating" position
           !value &&
-            'peer-data-placeholder:translate-y-0 peer-data-placeholder:scale-100 peer-data-placeholder:text-text/40',
-          'peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-primary',
-          'font-outfit font-medium text-sm'
+            'peer-data-placeholder:translate-y-0 peer-data-placeholder:scale-100 peer-data-placeholder:text-text',
+          'peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-text',
+          'font-outfit font-medium text-sm text-text'
         )}
       >
         {label}
