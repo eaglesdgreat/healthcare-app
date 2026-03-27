@@ -7,16 +7,25 @@ const identitySchema = z.object({
   dob: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
-  gender: z.enum(['male', 'female', 'other'], {
+  gender: z.enum(['MALE', 'FEMALE', 'OTHER'], {
     error: () => ({ message: 'Please select your gender at birth' }),
   }),
 })
 
 // Step 2: Contact & Security (The "Access")
 const contactSchema = z.object({
-  email: z.string().email('Invalid medical email address'),
+  email: z.email('Invalid medical email address').optional().nullable(),
   phone: z.string().min(10, 'Enter a valid phone number'),
-  password: z.string().min(8, 'Security requires at least 8 characters'),
+  password: z
+    .string()
+    .min(8, 'Security requires at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(
+      /[^A-Za-z0-9]/,
+      'Password must contain at least one special character'
+    ),
 })
 
 // Step 3: Clinical Baseline (The "Safety")

@@ -30,7 +30,7 @@ export function FloatingDatePicker({
           <Button
             variant="outline"
             className={cn(
-              'peer flex h-17.5 w-full items-center justify-start rounded-lg border-2 border-smoke/30 bg-background px-5 pb-3 pt-7 text-left text-lg font-medium text-text ring-0 focus:border-primary hover:bg-[#0a0a0a] hover:text-text',
+              'peer flex w-full items-center justify-start rounded-lg border-2 border-smoke/30 bg-background px-5 pb-4 pt-6 text-left text-lg font-medium text-text ring-0 focus:border-primary hover:bg-[#0a0a0a] hover:text-text',
               !value && 'text-text/40',
               className
             )}
@@ -59,8 +59,8 @@ export function FloatingDatePicker({
           'absolute left-5 top-5 z-10 origin-left -translate-y-4 scale-75 transform duration-300 pointer-events-none',
           !value &&
             'peer-aria-expanded:scale-75 peer-aria-expanded:-translate-y-4 peer-[&:not(:has(span))]:scale-100 peer-[&:not(:has(span))]:translate-y-0',
-          value && '-translate-y-4 scale-75 text-text/40',
-          'font-outfit font-medium text-sm'
+          value && '-translate-y-4 scale-75 text-text',
+          'font-outfit font-medium text-sm text-text'
         )}
       >
         {label}

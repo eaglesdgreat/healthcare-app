@@ -2,13 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Field,
-  // FieldDescription,
-  FieldError,
-  FieldGroup,
-  // FieldLabel,
-} from '@/components/ui/field'
+import { Field, FieldError, FieldGroup } from '@/components/ui/field'
 import { FloatingDatePicker } from '@/components/ui/floating-date-picker'
 import { FloatingInput } from '@/components/ui/floating-input'
 import { FloatingSelect } from '@/components/ui/floating-select'
@@ -92,7 +86,10 @@ export default function Stepper(props: {
                       />
                     </div>
                     {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} color="red" />
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-orange-800"
+                      />
                     )}
                   </Field>
                 )}
@@ -113,7 +110,10 @@ export default function Stepper(props: {
                       />
                     </div>
                     {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} color="red" />
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-orange-800"
+                      />
                     )}
                   </Field>
                 )}
@@ -128,122 +128,131 @@ export default function Stepper(props: {
                       <FloatingDatePicker
                         label="Date of Birth"
                         value={field.value ? new Date(field.value) : undefined}
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
+                        className="h-17.5! font-outfit font-medium text-2xl border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
                         onChange={(date) =>
                           field.onChange(date?.toISOString().split('T')[0])
                         }
                       />
                     </div>
                     {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} color="red" />
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-orange-800"
+                      />
                     )}
                   </Field>
-                  // <div className="space-y-2">
-                  //   <FloatingDatePicker
-                  //     label="Date of Birth"
-                  //     value={field.value ? new Date(field.value) : undefined}
-                  //     onChange={(date) =>
-                  //       field.onChange(date?.toISOString().split('T')[0])
-                  //     }
-                  //   />
-                  //   {form.formState.errors.dob && (
-                  //     <p className="text-secondary-2 text-xs ml-2">
-                  //       {form.formState.errors.dob.message as string}
-                  //     </p>
-                  //   )}
-                  // </div>
                 )}
               />
 
               <Controller
-                name="bloodGroup"
+                name="gender"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <div className="relative bg-background">
                       <FloatingSelect
                         label="Gender"
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
+                        className="h-17.5! font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
                         options={[
-                          { label: 'Male', value: 'M' },
-                          { label: 'Female', value: 'F' },
-                          { label: 'Others', value: 'O' },
+                          { label: 'Male', value: 'MALE' },
+                          { label: 'Female', value: 'FEMALE' },
+                          { label: 'Others', value: 'OTHER' },
                         ]}
                         value={field.value}
                         onValueChange={field.onChange}
                       />
                     </div>
                     {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} color="red" />
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-orange-800"
+                      />
                     )}
                   </Field>
-                  // <div className="space-y-2">
-                  //   <FloatingSelect
-                  //     label="Blood Group"
-                  //     options={bloodGroups}
-                  //     value={field.value}
-                  //     onValueChange={field.onChange}
-                  //   />
-                  //   {form.formState.errors.bloodGroup && (
-                  //     <p className="text-secondary-2 text-xs ml-2">
-                  //       {form.formState.errors.bloodGroup.message}
-                  //     </p>
-                  //   )}
-                  // </div>
                 )}
               />
-
-              {/* <Controller
-                name="dob"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <Field data-invalid={fieldState.invalid}>
-                        <div className="relative bg-background">
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant="outline"
-                                data-empty={!date}
-                                className="w-70 justify-start text-left font-normal data-[empty=true]:text-muted-foreground"
-                              >
-                                <CalendarIcon />
-                                {date ? (
-                                  format(date, 'PPP')
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                              <Calendar
-                                mode="single"
-                                selected={date}
-                                onSelect={setDate}
-                                {...field}
-                              />
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} color="red" />
-                        )}
-                      </Field>
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} color="red" />
-                    )}
-                  </Field>
-                )}
-              /> */}
             </FieldGroup>
           </TabsContent>
 
           <TabsContent value="contact" className="py-6 space-y-4">
             <p className="text-text/60 text-base font-semibold">
-              Step 2: Communication & Security
+              Step 2: Contact & Security
             </p>
+
+            <FieldGroup>
+              <Controller
+                name="email"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
+                      <FloatingInput
+                        aria-invalid={fieldState.invalid}
+                        placeholder="name@hospital.com"
+                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
+                        label="Email"
+                        {...field}
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-orange-800"
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="phone"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
+                      <FloatingInput
+                        aria-invalid={fieldState.invalid}
+                        placeholder="070XXXXXX"
+                        label="Phone Number"
+                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
+                        {...field}
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-orange-800"
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="password"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
+                      <FloatingInput
+                        aria-invalid={fieldState.invalid}
+                        type="password"
+                        placeholder="••••••••"
+                        label="Password"
+                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
+                        {...field}
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-orange-800"
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
           </TabsContent>
 
           <TabsContent value="medical" className="py-6 space-y-4">

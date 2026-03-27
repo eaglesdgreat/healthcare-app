@@ -16,7 +16,7 @@ const FloatingInput = React.forwardRef<HTMLInputElement, FloatingInputProps>(
           ref={ref}
           placeholder=" " // Keep a space so peer-placeholder-shown works
           className={cn(
-            'peer block w-full appearance-none rounded-lg border bg-background px-5 py-5 text-sm text-text focus:border-primary focus:outline-none focus:ring-0',
+            'peer block w-full appearance-none rounded-lg border bg-background px-5 pb-4 pt-6 text-sm text-text focus:border-primary focus:outline-none focus:ring-0',
             className
           )}
         />
