@@ -45,7 +45,7 @@ export function FloatingSelect({
       </Select>
       <Label
         className={cn(
-          'absolute left-5 top-5 z-10 origin-left -translate-y-4 scale-75 transform duration-300 pointer-events-none',
+          'absolute left-5 top-5 z-10 origin-left -translate-y-4 scale-75 transform text-sm text-text/40 duration-300 pointer-events-none',
           // If a value exists, keep it in the "floating" position
           !value &&
             'peer-data-placeholder:translate-y-0 peer-data-placeholder:scale-100 peer-data-placeholder:text-text',

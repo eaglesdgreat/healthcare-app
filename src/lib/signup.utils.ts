@@ -37,6 +37,6 @@ const medicalSchema = z.object({
 
 // The Final Master Schema
 export const registrationSchema = identitySchema
-  .merge(contactSchema)
-  .merge(medicalSchema)
+  .extend(contactSchema.shape)
+  .extend(medicalSchema.shape)
 export type RegistrationValues = z.infer<typeof registrationSchema>
