@@ -1,13 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Controller, useForm } from 'react-hook-form'
 import { useState } from 'react'
+import SignupReview from '@/components/SignupReview'
 import { Button } from '@/components/ui/button'
 import { Field, FieldError, FieldGroup } from '@/components/ui/field'
 import { FloatingDatePicker } from '@/components/ui/floating-date-picker'
 import { FloatingInput } from '@/components/ui/floating-input'
 import { FloatingSelect } from '@/components/ui/floating-select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { registrationSchema, type RegistrationValues } from '@/lib/signup.utils'
+import {
+  bloodGroups,
+  genotypes,
+  registrationSchema,
+  type RegistrationValues,
+} from '@/lib/signup.utils'
 
 export default function Stepper(props: {
   onSubmit: (data: RegistrationValues) => void
@@ -27,12 +33,21 @@ export default function Stepper(props: {
       fieldsToValidate = ['firstName', 'lastName', 'dob', 'gender']
     if (currentStep === 'contact')
       fieldsToValidate = ['email', 'phone', 'password']
+    if (currentStep === 'medical')
+      fieldsToValidate = [
+        'bloodGroup',
+        'genotype',
+        'allergies',
+        'emergencyContactPhone',
+        'emergencyContactName',
+      ]
 
     const isStepValid = await form.trigger(fieldsToValidate)
 
     if (isStepValid) {
       if (currentStep === 'identity') setCurrentStep('contact')
       else if (currentStep === 'contact') setCurrentStep('medical')
+      else if (currentStep === 'medical') setCurrentStep('review')
     }
   }
 
@@ -40,7 +55,7 @@ export default function Stepper(props: {
     <div className="w-full max-w-2xl mx-auto p-6">
       <Tabs value={currentStep} className="w-full">
         {/* Progress Visuals */}
-        <TabsList className="grid w-full grid-cols-3 bg-neutral border border-white/5 text-outfit">
+        <TabsList className="grid w-full grid-cols-4 bg-neutral border border-white/5 text-outfit">
           <TabsTrigger
             value="identity"
             disabled
@@ -61,6 +76,13 @@ export default function Stepper(props: {
             className="data-[state=active]:bg-primary"
           >
             Medical
+          </TabsTrigger>
+          <TabsTrigger
+            value="review"
+            disabled
+            className="data-[state=active]:bg-primary"
+          >
+            Review
           </TabsTrigger>
         </TabsList>
 
@@ -88,7 +110,7 @@ export default function Stepper(props: {
                     {fieldState.invalid && (
                       <FieldError
                         errors={[fieldState.error]}
-                        className="text-orange-800"
+                        className="text-secondary-2"
                       />
                     )}
                   </Field>
@@ -112,7 +134,7 @@ export default function Stepper(props: {
                     {fieldState.invalid && (
                       <FieldError
                         errors={[fieldState.error]}
-                        className="text-orange-800"
+                        className="text-secondary-2"
                       />
                     )}
                   </Field>
@@ -137,7 +159,7 @@ export default function Stepper(props: {
                     {fieldState.invalid && (
                       <FieldError
                         errors={[fieldState.error]}
-                        className="text-orange-800"
+                        className="text-secondary-2"
                       />
                     )}
                   </Field>
@@ -165,7 +187,7 @@ export default function Stepper(props: {
                     {fieldState.invalid && (
                       <FieldError
                         errors={[fieldState.error]}
-                        className="text-orange-800"
+                        className="text-secondary-2"
                       />
                     )}
                   </Field>
@@ -197,7 +219,7 @@ export default function Stepper(props: {
                     {fieldState.invalid && (
                       <FieldError
                         errors={[fieldState.error]}
-                        className="text-orange-800"
+                        className="text-secondary-2"
                       />
                     )}
                   </Field>
@@ -221,7 +243,7 @@ export default function Stepper(props: {
                     {fieldState.invalid && (
                       <FieldError
                         errors={[fieldState.error]}
-                        className="text-orange-800"
+                        className="text-secondary-2"
                       />
                     )}
                   </Field>
@@ -246,7 +268,7 @@ export default function Stepper(props: {
                     {fieldState.invalid && (
                       <FieldError
                         errors={[fieldState.error]}
-                        className="text-orange-800"
+                        className="text-secondary-2"
                       />
                     )}
                   </Field>
@@ -259,6 +281,135 @@ export default function Stepper(props: {
             <p className="text-text/60 text-base font-semibold">
               Step 3: Clinical Baseline
             </p>
+
+            <FieldGroup>
+              <Controller
+                name="bloodGroup"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
+                      <FloatingSelect
+                        label="Blood Group"
+                        className="h-17.5! font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
+                        options={bloodGroups}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-secondary-2"
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="genotype"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
+                      <FloatingSelect
+                        label="Genotype"
+                        className="h-17.5! font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
+                        options={genotypes}
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-secondary-2"
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="allergies"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
+                      <FloatingInput
+                        aria-invalid={fieldState.invalid}
+                        placeholder="070XXXXXX"
+                        label="Allergies (if any)"
+                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
+                        {...field}
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-secondary-2"
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="emergencyContactPhone"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
+                      <FloatingInput
+                        aria-invalid={fieldState.invalid}
+                        placeholder="070XXXXXX"
+                        label="Emergency Contact Phone"
+                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
+                        {...field}
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-secondary-2"
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+
+              <Controller
+                name="emergencyContactName"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <div className="relative bg-background">
+                      <FloatingInput
+                        aria-invalid={fieldState.invalid}
+                        placeholder="John Doe"
+                        label="Emergency Contact Name"
+                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
+                        {...field}
+                      />
+                    </div>
+                    {fieldState.invalid && (
+                      <FieldError
+                        errors={[fieldState.error]}
+                        className="text-secondary-2"
+                      />
+                    )}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+          </TabsContent>
+
+          <TabsContent value="review" className="py-6">
+            <SignupReview
+              data={form.getValues()}
+              setCurrentStep={setCurrentStep}
+            />
           </TabsContent>
 
           {/* Controls */}
@@ -270,13 +421,14 @@ export default function Stepper(props: {
                 onClick={() => {
                   if (currentStep === 'contact') setCurrentStep('identity')
                   if (currentStep === 'medical') setCurrentStep('contact')
+                  if (currentStep === 'review') setCurrentStep('medical')
                 }}
               >
                 Back
               </Button>
             )}
 
-            {currentStep !== 'medical' ? (
+            {currentStep !== 'review' ? (
               <Button
                 type="button"
                 className="ml-auto bg-secondary"
