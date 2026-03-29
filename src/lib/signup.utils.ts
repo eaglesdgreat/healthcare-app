@@ -31,8 +31,12 @@ const contactSchema = z.object({
 // Step 3: Clinical Baseline (The "Safety")
 const medicalSchema = z.object({
   bloodGroup: z.string().min(1, 'Blood group is required for your Health ID'),
+  genotype: z.string().min(1, 'Genotype is required for your Health ID'),
   allergies: z.string().optional(),
-  emergencyContact: z.string().min(10, 'Emergency contact is required'),
+  emergencyContactPhone: z
+    .string()
+    .min(10, 'Emergency contact phone is required'),
+  emergencyContactName: z.string().min(2, 'Emergency contact name is required'),
 })
 
 // The Final Master Schema
@@ -40,3 +44,21 @@ export const registrationSchema = identitySchema
   .extend(contactSchema.shape)
   .extend(medicalSchema.shape)
 export type RegistrationValues = z.infer<typeof registrationSchema>
+
+export const bloodGroups = [
+  { label: 'A+', value: 'A+' },
+  { label: 'A-', value: 'A-' },
+  { label: 'B+', value: 'B+' },
+  { label: 'B-', value: 'B-' },
+  { label: 'O+', value: 'O+' },
+  { label: 'O-', value: 'O-' },
+  { label: 'AB+', value: 'AB+' },
+  { label: 'AB-', value: 'AB-' },
+]
+
+export const genotypes = [
+  { label: 'AA', value: 'AA' },
+  { label: 'AS', value: 'AS' },
+  { label: 'SS', value: 'SS' },
+  { label: 'AC', value: 'AC' },
+]

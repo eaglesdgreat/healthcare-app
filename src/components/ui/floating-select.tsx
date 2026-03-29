@@ -29,7 +29,7 @@ export function FloatingSelect({
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger
           className={cn(
-            'peer flex w-full appearance-none items-center justify-between rounded-lg border-2 border-smoke/30 bg-background px-5 pb-4 pt-6 text-lg font-medium text-text outline-none focus:border-primary focus:ring-0',
+            'peer flex w-full appearance-none items-center justify-between rounded-lg border-2 border-smoke/30 bg-background px-5 pb-4 pt-6 text-lg font-medium text-text outline-none focus:border-primary focus:ring-0 cursor-pointer',
             className
           )}
         >
@@ -37,7 +37,11 @@ export function FloatingSelect({
         </SelectTrigger>
         <SelectContent className="bg-neutral border-white/10 text-text">
           {options.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
+            <SelectItem
+              key={opt.value}
+              value={opt.value}
+              className="cursor-pointer"
+            >
               {opt.label}
             </SelectItem>
           ))}
