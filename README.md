@@ -35,30 +35,45 @@ For local development, the Vite proxy forwards `/auth/*` to the gateway at `http
 
 ## Development
 
+Run the development server directly:
+
 ```bash
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
+Or start the hot-reloading Docker development environment:
+
+```bash
+make start
+```
+
+The app is available at `http://localhost:5173`. The frontend container proxies `/auth/*` to the gateway on the host at `http://localhost:8080` by default. Override `VITE_API_GATEWAY_URL` in the environment when the gateway uses a different address. Use `make stop` to stop the development container.
+
+The Makefile shortcuts require GNU Make and Docker Compose v2. Without GNU Make, start the same development stack with `docker compose up --detach --build`.
+
 ## Checks
 
 ```bash
+pnpm run typecheck
 pnpm test
 pnpm build
 pnpm lint
 pnpm test:e2e
 ```
 
-Build before running Playwright locally; the browser suite uses the production preview so it exercises the same service worker and asset caching as the container.
+The same checks are available through `make typecheck`, `make test`, and other Makefile targets. Build before running Playwright locally; the browser suite uses the production preview so it exercises the same service worker and asset caching as the container.
 
 ## Container
 
-Build and run the static frontend container:
+Build and run the static production frontend container:
 
 ```bash
 docker build --build-arg VITE_API_BASE_URL=/auth -t healthcare-app .
 docker run --rm -p 8080:80 healthcare-app
 ```
+
+`make build-release` and `make run-release` provide the same release workflow.
 
 The container serves the SPA and service worker. Route `/auth/*` from the browser to the API gateway at the deployment ingress; do not expose auth microservices directly to the browser. Configure the API gateway's `/auth` prefix rewrite as described in [DESIGN.md](./DESIGN.md).
 
@@ -66,7 +81,7 @@ The container serves the SPA and service worker. Route `/auth/*` from the browse
 
 - Vitest and Testing Library cover validation, API behavior, and interactive React flows.
 - Playwright covers registration/authentication, responsive layout, and offline status behavior.
-- GitHub Actions runs lint, unit/integration tests, production build, end-to-end tests, and a Docker build for pushes and pull requests to `main` and `master`.
+- GitHub Actions runs typecheck, lint, unit/integration tests, production build, end-to-end tests, Docker Compose validation, and a Docker build for pushes and pull requests to `main` and `master`.
 
 ## Figma
 
