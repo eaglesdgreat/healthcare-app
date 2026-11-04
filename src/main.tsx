@@ -8,3 +8,11 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>
 )
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    void navigator.serviceWorker.register('/sw.js').catch((error: unknown) => {
+      console.error('Unable to register the offline app shell.', error)
+    })
+  })
+}

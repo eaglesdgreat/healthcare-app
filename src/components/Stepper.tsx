@@ -1,449 +1,369 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Controller, useForm } from 'react-hook-form'
+import { Check, LoaderCircle } from 'lucide-react'
+import { useForm, useWatch } from 'react-hook-form'
+import type { FieldPath } from 'react-hook-form'
 import { useState } from 'react'
 import SignupReview from '@/components/SignupReview'
 import { Button } from '@/components/ui/button'
-import { Field, FieldError, FieldGroup } from '@/components/ui/field'
-import { FloatingDatePicker } from '@/components/ui/floating-date-picker'
-import { FloatingInput } from '@/components/ui/floating-input'
-import { FloatingSelect } from '@/components/ui/floating-select'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useNetworkStatus } from '@/hooks/useNetworkStatus'
 import {
-  bloodGroups,
-  genotypes,
   registrationSchema,
+  userRoles,
   type RegistrationValues,
+  type UserRole,
 } from '@/lib/signup.utils'
 
-export default function Stepper(props: {
-  onSubmit: (data: RegistrationValues) => void
-}) {
-  const [currentStep, setCurrentStep] = useState('identity')
+type RegistrationStep = 'identity' | 'account' | 'review'
 
+interface StepperProps {
+  onSubmit: (data: RegistrationValues) => Promise<void>
+  initialRole?: UserRole
+}
+
+const steps: { key: RegistrationStep; label: string }[] = [
+  { key: 'identity', label: 'About you' },
+  { key: 'account', label: 'Account' },
+  { key: 'review', label: 'Review' },
+]
+
+const fieldsByStep: Record<
+  Exclude<RegistrationStep, 'review'>,
+  FieldPath<RegistrationValues>[]
+> = {
+  identity: ['firstName', 'lastName', 'role'],
+  account: ['email', 'phoneNumber', 'password', 'confirmPassword'],
+}
+
+export default function Stepper({
+  onSubmit,
+  initialRole = 'PATIENT',
+}: StepperProps) {
+  const [currentStep, setCurrentStep] = useState<RegistrationStep>('identity')
+  const [submitError, setSubmitError] = useState('')
+  const isOnline = useNetworkStatus()
   const form = useForm<RegistrationValues>({
     resolver: zodResolver(registrationSchema),
-    mode: 'onChange',
+    mode: 'onTouched',
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phoneNumber: '',
+      role: initialRole,
+      password: '',
+      confirmPassword: '',
+    },
   })
 
-  const handleNext = async () => {
-    let fieldsToValidate: unknown[] = []
+  const inputClass =
+    'h-12 w-full rounded-xl border border-white/15 bg-white/[0.04] px-4 text-base text-white outline-none transition placeholder:text-text/60 focus:border-primary focus:ring-2 focus:ring-primary/30'
 
-    // Logic: Only validate fields for the CURRENT step
-    if (currentStep === 'identity')
-      fieldsToValidate = ['firstName', 'lastName', 'dob', 'gender']
-    if (currentStep === 'contact')
-      fieldsToValidate = ['email', 'phone', 'password']
-    if (currentStep === 'medical')
-      fieldsToValidate = [
-        'bloodGroup',
-        'genotype',
-        'allergies',
-        'emergencyContactPhone',
-        'emergencyContactName',
-      ]
+  async function handleNext() {
+    if (currentStep === 'review') return
+    const isValid = await form.trigger(fieldsByStep[currentStep])
+    if (!isValid) return
+    setCurrentStep(currentStep === 'identity' ? 'account' : 'review')
+    setSubmitError('')
+  }
 
-    const isStepValid = await form.trigger(fieldsToValidate)
+  function handleBack() {
+    setCurrentStep(currentStep === 'review' ? 'account' : 'identity')
+    setSubmitError('')
+  }
 
-    if (isStepValid) {
-      if (currentStep === 'identity') setCurrentStep('contact')
-      else if (currentStep === 'contact') setCurrentStep('medical')
-      else if (currentStep === 'medical') setCurrentStep('review')
+  async function handleSubmit(values: RegistrationValues) {
+    setSubmitError('')
+    try {
+      await onSubmit(values)
+    } catch (error) {
+      if (error instanceof Error) {
+        setSubmitError(error.message)
+      } else {
+        console.error('Registration failed with a non-error value.', error)
+        setSubmitError('Something went wrong. Please try again.')
+      }
     }
   }
 
+  const watchedValues = useWatch({ control: form.control })
+  const values: RegistrationValues = {
+    firstName: watchedValues.firstName ?? '',
+    lastName: watchedValues.lastName ?? '',
+    email: watchedValues.email ?? '',
+    phoneNumber: watchedValues.phoneNumber ?? '',
+    role: watchedValues.role ?? initialRole,
+    password: watchedValues.password ?? '',
+    confirmPassword: watchedValues.confirmPassword ?? '',
+  }
+
   return (
-    <div className="w-full max-w-2xl mx-auto p-6">
-      <Tabs value={currentStep} className="w-full">
-        {/* Progress Visuals */}
-        <TabsList className="grid w-full grid-cols-4 bg-neutral border border-white/5 text-outfit">
-          <TabsTrigger
-            value="identity"
-            disabled
-            className="data-[state=active]:bg-primary"
-          >
-            Identity
-          </TabsTrigger>
-          <TabsTrigger
-            value="contact"
-            disabled
-            className="data-[state=active]:bg-primary"
-          >
-            Contact
-          </TabsTrigger>
-          <TabsTrigger
-            value="medical"
-            disabled
-            className="data-[state=active]:bg-primary"
-          >
-            Medical
-          </TabsTrigger>
-          <TabsTrigger
-            value="review"
-            disabled
-            className="data-[state=active]:bg-primary"
-          >
-            Review
-          </TabsTrigger>
-        </TabsList>
+    <div>
+      <ol
+        aria-label="Registration progress"
+        className="mb-8 grid grid-cols-3 gap-2"
+      >
+        {steps.map((step, index) => {
+          const currentIndex = steps.findIndex(
+            (item) => item.key === currentStep
+          )
+          const isComplete = index < currentIndex
+          const isCurrent = step.key === currentStep
 
-        <form onSubmit={form.handleSubmit((data) => props.onSubmit(data))}>
-          <TabsContent value="identity" className="py-6 space-y-4">
-            {/* Use your FloatingInput components here */}
-            <p className="text-base font-semibold text-text/60">
-              Step 1: Legal Identity
-            </p>
-            <FieldGroup>
-              <Controller
+          return (
+            <li
+              key={step.key}
+              aria-current={isCurrent ? 'step' : undefined}
+              className={`flex items-center gap-2 border-b-2 pb-3 text-xs sm:text-sm ${
+                isCurrent
+                  ? 'border-primary text-white'
+                  : isComplete
+                    ? 'border-primary/50 text-purple-200'
+                    : 'border-white/10 text-text/60'
+              }`}
+            >
+              <span className="grid size-6 shrink-0 place-items-center rounded-full bg-white/10 text-xs">
+                {isComplete ? (
+                  <Check size={14} aria-hidden="true" />
+                ) : (
+                  index + 1
+                )}
+              </span>
+              {step.label}
+            </li>
+          )
+        })}
+      </ol>
+
+      <form
+        noValidate
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-5"
+      >
+        {currentStep === 'identity' && (
+          <section aria-labelledby="registration-identity-heading">
+            <h2
+              id="registration-identity-heading"
+              className="mb-4 text-lg font-medium text-white"
+            >
+              Tell us who you are
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                label="First name"
                 name="firstName"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingInput
-                        aria-invalid={fieldState.invalid}
-                        placeholder="John"
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
-                        label="First Name"
-                        {...field}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
+                register={form.register}
+                error={form.formState.errors.firstName?.message}
+                className={inputClass}
+                autoComplete="given-name"
               />
-
-              <Controller
+              <FormField
+                label="Last name"
                 name="lastName"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingInput
-                        aria-invalid={fieldState.invalid}
-                        placeholder="Doe"
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
-                        label="Last Name"
-                        {...field}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
+                register={form.register}
+                error={form.formState.errors.lastName?.message}
+                className={inputClass}
+                autoComplete="family-name"
               />
+            </div>
+            <fieldset className="mt-6">
+              <legend className="mb-3 text-sm font-medium text-white">
+                I am joining as a
+              </legend>
+              <div className="grid grid-cols-3 gap-2">
+                {userRoles.map((role) => (
+                  <label
+                    key={role}
+                    className={`flex min-h-12 cursor-pointer items-center justify-center rounded-xl border px-2 text-center text-xs transition sm:text-sm ${
+                      values.role === role
+                        ? 'border-primary bg-primary/15 text-white'
+                        : 'border-white/15 text-text hover:border-primary/60'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      value={role}
+                      className="sr-only"
+                      {...form.register('role')}
+                    />
+                    {role.charAt(0) + role.slice(1).toLowerCase()}
+                  </label>
+                ))}
+              </div>
+              {form.formState.errors.role && (
+                <p className="mt-2 text-sm text-rose-300">
+                  {form.formState.errors.role.message}
+                </p>
+              )}
+            </fieldset>
+          </section>
+        )}
 
-              <Controller
-                name="dob"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingDatePicker
-                        label="Date of Birth"
-                        value={field.value ? new Date(field.value) : undefined}
-                        className="h-17.5! font-outfit font-medium text-2xl border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
-                        onChange={(date) =>
-                          field.onChange(date?.toISOString().split('T')[0])
-                        }
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
-              />
-
-              <Controller
-                name="gender"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingSelect
-                        label="Gender"
-                        className="h-17.5! font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
-                        options={[
-                          { label: 'Male', value: 'MALE' },
-                          { label: 'Female', value: 'FEMALE' },
-                          { label: 'Others', value: 'OTHER' },
-                        ]}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-          </TabsContent>
-
-          <TabsContent value="contact" className="py-6 space-y-4">
-            <p className="text-text/60 text-base font-semibold">
-              Step 2: Contact & Security
-            </p>
-
-            <FieldGroup>
-              <Controller
+        {currentStep === 'account' && (
+          <section aria-labelledby="registration-account-heading">
+            <h2
+              id="registration-account-heading"
+              className="mb-4 text-lg font-medium text-white"
+            >
+              Set up your account
+            </h2>
+            <div className="space-y-4">
+              <FormField
+                label="Email address"
                 name="email"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingInput
-                        aria-invalid={fieldState.invalid}
-                        placeholder="name@hospital.com"
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
-                        label="Email"
-                        {...field}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
+                type="email"
+                register={form.register}
+                error={form.formState.errors.email?.message}
+                className={inputClass}
+                autoComplete="email"
               />
-
-              <Controller
-                name="phone"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingInput
-                        aria-invalid={fieldState.invalid}
-                        placeholder="070XXXXXX"
-                        label="Phone Number"
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
-                        {...field}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
+              <FormField
+                label="Phone number (include country code)"
+                name="phoneNumber"
+                type="tel"
+                register={form.register}
+                error={form.formState.errors.phoneNumber?.message}
+                className={inputClass}
+                placeholder="+2348012345678"
+                autoComplete="tel"
               />
-
-              <Controller
+              <FormField
+                label="Password"
                 name="password"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingInput
-                        aria-invalid={fieldState.invalid}
-                        type="password"
-                        placeholder="••••••••"
-                        label="Password"
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
-                        {...field}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
+                type="password"
+                register={form.register}
+                error={form.formState.errors.password?.message}
+                className={inputClass}
+                autoComplete="new-password"
               />
-            </FieldGroup>
-          </TabsContent>
-
-          <TabsContent value="medical" className="py-6 space-y-4">
-            <p className="text-text/60 text-base font-semibold">
-              Step 3: Clinical Baseline
-            </p>
-
-            <FieldGroup>
-              <Controller
-                name="bloodGroup"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingSelect
-                        label="Blood Group"
-                        className="h-17.5! font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
-                        options={bloodGroups}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
+              <FormField
+                label="Confirm password"
+                name="confirmPassword"
+                type="password"
+                register={form.register}
+                error={form.formState.errors.confirmPassword?.message}
+                className={inputClass}
+                autoComplete="new-password"
               />
+              <p className="text-xs leading-5 text-text/70">
+                Use at least 8 characters with uppercase and lowercase letters,
+                a number, and a special character.
+              </p>
+            </div>
+          </section>
+        )}
 
-              <Controller
-                name="genotype"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingSelect
-                        label="Genotype"
-                        className="h-17.5! font-outfit font-medium text-2xl text-text bg-background border-2 border-smoke/30 focus:ring-1 focus:ring-primary"
-                        options={genotypes}
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
-              />
+        {currentStep === 'review' && (
+          <SignupReview data={values} setCurrentStep={setCurrentStep} />
+        )}
 
-              <Controller
-                name="allergies"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingInput
-                        aria-invalid={fieldState.invalid}
-                        placeholder="070XXXXXX"
-                        label="Allergies (if any)"
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
-                        {...field}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
-              />
+        {submitError && (
+          <p
+            role="alert"
+            className="rounded-xl border border-rose-300/30 bg-rose-300/10 px-4 py-3 text-sm text-rose-100"
+          >
+            {submitError}
+          </p>
+        )}
 
-              <Controller
-                name="emergencyContactPhone"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingInput
-                        aria-invalid={fieldState.invalid}
-                        placeholder="070XXXXXX"
-                        label="Emergency Contact Phone"
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
-                        {...field}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
-              />
+        {currentStep === 'review' && !isOnline && (
+          <p className="text-sm text-amber-200">
+            Reconnect before creating your account. Your details are not saved
+            outside this page.
+          </p>
+        )}
 
-              <Controller
-                name="emergencyContactName"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <div className="relative bg-background">
-                      <FloatingInput
-                        aria-invalid={fieldState.invalid}
-                        placeholder="John Doe"
-                        label="Emergency Contact Name"
-                        className="h-17.5 font-outfit font-medium text-2xl text-text bg-background border-2 border-white/10 focus:ring-1 focus:ring-primary"
-                        {...field}
-                      />
-                    </div>
-                    {fieldState.invalid && (
-                      <FieldError
-                        errors={[fieldState.error]}
-                        className="text-secondary-2"
-                      />
-                    )}
-                  </Field>
-                )}
-              />
-            </FieldGroup>
-          </TabsContent>
+        <div className="flex items-center justify-between gap-3 pt-2">
+          {currentStep !== 'identity' ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleBack}
+              className="min-h-11 border-white/20 text-white hover:bg-white/10"
+            >
+              Back
+            </Button>
+          ) : (
+            <span />
+          )}
 
-          <TabsContent value="review" className="py-6">
-            <SignupReview
-              data={form.getValues()}
-              setCurrentStep={setCurrentStep}
-            />
-          </TabsContent>
+          {currentStep !== 'review' ? (
+            <Button
+              type="button"
+              onClick={() => void handleNext()}
+              className="min-h-11 bg-title-gradient px-6 text-white hover:opacity-90"
+            >
+              Continue
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              disabled={!isOnline || form.formState.isSubmitting}
+              className="min-h-11 bg-title-gradient px-6 text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {form.formState.isSubmitting ? (
+                <>
+                  <LoaderCircle
+                    size={17}
+                    className="animate-spin"
+                    aria-hidden="true"
+                  />
+                  Creating account…
+                </>
+              ) : (
+                'Create account'
+              )}
+            </Button>
+          )}
+        </div>
+      </form>
+    </div>
+  )
+}
 
-          {/* Controls */}
-          <div className="flex justify-between mt-8">
-            {currentStep !== 'identity' && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  if (currentStep === 'contact') setCurrentStep('identity')
-                  if (currentStep === 'medical') setCurrentStep('contact')
-                  if (currentStep === 'review') setCurrentStep('medical')
-                }}
-              >
-                Back
-              </Button>
-            )}
+interface FormFieldProps {
+  label: string
+  name: FieldPath<RegistrationValues>
+  type?: string
+  placeholder?: string
+  autoComplete?: string
+  className: string
+  error?: string
+  register: ReturnType<typeof useForm<RegistrationValues>>['register']
+}
 
-            {currentStep !== 'review' ? (
-              <Button
-                type="button"
-                className="ml-auto bg-secondary"
-                onClick={handleNext}
-              >
-                Next Step
-              </Button>
-            ) : (
-              <Button type="submit" className="ml-auto bg-title-gradient">
-                Create Health ID
-              </Button>
-            )}
-          </div>
-        </form>
-      </Tabs>
+function FormField({
+  label,
+  name,
+  type = 'text',
+  placeholder,
+  autoComplete,
+  className,
+  error,
+  register,
+}: FormFieldProps) {
+  const id = `registration-${name}`
+  const errorId = `${id}-error`
+
+  return (
+    <div>
+      <label htmlFor={id} className="mb-2 block text-sm font-medium text-white">
+        {label}
+      </label>
+      <input
+        id={id}
+        type={type}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        className={className}
+        {...register(name)}
+      />
+      {error && (
+        <p id={errorId} className="mt-2 text-sm text-rose-300">
+          {error}
+        </p>
+      )}
     </div>
   )
 }

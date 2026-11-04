@@ -1,66 +1,66 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { HeartPulse, LogOut } from 'lucide-react'
+import { Link, Outlet, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
+import { signOut as revokeSession } from '@/api/auth'
+import { Button } from '@/components/ui/button'
+import { useAuth } from '@/context/auth/useAuth'
 
-const RootLayout = () => {
+export default function RootLayout() {
+  const { session, clearSession } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleSignOut() {
+    const refreshToken = session?.refreshToken
+    clearSession()
+    navigate('/', { replace: true })
+    if (!refreshToken) return
+
+    try {
+      await revokeSession(refreshToken)
+    } catch (error) {
+      console.error('Unable to revoke the signed-out session.', error)
+      toast.warn(
+        'You have been signed out on this device, but the server could not revoke the session.'
+      )
+    }
+  }
+
+  const role = session
+    ? session.user.role.charAt(0) + session.user.role.slice(1).toLowerCase()
+    : undefined
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header */}
-      <header className="bg-white shadow-sm">
-        <nav className="container mx-auto px-4 py-4">
-          <ul className="flex space-x-6">
-            <li>
-              <NavLink
-                to="/"
-                className={({ isActive }) =>
-                  `text-gray-700 hover:text-blue-600 transition-colors ${
-                    isActive ? 'text-blue-600 font-semibold' : ''
-                  }`
-                }
-                end
-              >
-                Home
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/about"
-                className={({ isActive }) =>
-                  `text-gray-700 hover:text-blue-600 transition-colors ${
-                    isActive ? 'text-blue-600 font-semibold' : ''
-                  }`
-                }
-              >
-                About
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/products"
-                className={({ isActive }) =>
-                  `text-gray-700 hover:text-blue-600 transition-colors ${
-                    isActive ? 'text-blue-600 font-semibold' : ''
-                  }`
-                }
-              >
-                Products
-              </NavLink>
-            </li>
-          </ul>
+    <div className="min-h-screen">
+      <header className="border-b border-white/10 bg-black/20">
+        <nav className="container-custom flex min-h-16 items-center justify-between gap-4 py-3">
+          <Link
+            to="/appointments"
+            className="flex items-center gap-2 font-semibold text-white no-underline!"
+          >
+            <HeartPulse className="text-primary" aria-hidden="true" />
+            Medical
+          </Link>
+          <div className="flex items-center gap-3">
+            <span className="hidden text-sm text-text sm:inline">
+              {session?.user.firstName} {session?.user.lastName}
+              {role ? ` · ${role}` : ''}
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void handleSignOut()}
+              className="min-h-10 border-white/15 text-white hover:bg-white/10"
+            >
+              <LogOut size={16} aria-hidden="true" />
+              <span className="hidden sm:inline">Sign out</span>
+              <span className="sm:hidden">Sign out</span>
+            </Button>
+          </div>
         </nav>
       </header>
-
-      {/* Main Content Area - Child routes render here */}
-      <main className="container mx-auto px-4 py-8">
+      <main className="container-custom py-8 sm:py-12">
         <Outlet />
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t mt-auto">
-        <div className="container mx-auto px-4 py-6 text-center text-gray-600">
-          © 2024 My App. All rights reserved.
-        </div>
-      </footer>
     </div>
   )
 }
-
-export default RootLayout
