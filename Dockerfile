@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:22-alpine AS base
 
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@11.20.0 --activate
@@ -7,6 +7,15 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
+
+FROM base AS development
+
+ENV HOST=0.0.0.0
+EXPOSE 5173
+CMD ["pnpm", "dev", "--host", "0.0.0.0"]
+
+FROM base AS build
+
 ARG VITE_API_BASE_URL=/auth
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN pnpm build

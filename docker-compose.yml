@@ -1,0 +1,21 @@
+services:
+  healthcare-frontend:
+    container_name: healthcare-frontend
+    build:
+      context: .
+      target: development
+    volumes:
+      - ./:/app:cached
+      - /app/node_modules
+    ports:
+      - '127.0.0.1:5173:5173'
+    environment:
+      NODE_ENV: development
+      VITE_API_BASE_URL: /auth
+      VITE_API_GATEWAY_URL: ${VITE_API_GATEWAY_URL:-http://host.docker.internal:8080}
+      CHOKIDAR_USEPOLLING: 'true'
+      CHOKIDAR_INTERVAL: '1000'
+      WATCHPACK_POLLING: 'true'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    restart: unless-stopped
