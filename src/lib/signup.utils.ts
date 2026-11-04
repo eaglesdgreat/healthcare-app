@@ -1,64 +1,47 @@
 import * as z from 'zod'
 
-// Step 1: Identity (The "Who")
-const identitySchema = z.object({
-  firstName: z.string().min(2, 'First name is required'),
-  lastName: z.string().min(2, 'Last name is required'),
-  dob: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)'),
-  gender: z.enum(['MALE', 'FEMALE', 'OTHER'], {
-    error: () => ({ message: 'Please select your gender at birth' }),
-  }),
-})
+export const userRoles = ['PATIENT', 'DOCTOR', 'HOSPITAL'] as const
+export const userRoleSchema = z.enum(userRoles)
+export type UserRole = z.infer<typeof userRoleSchema>
 
-// Step 2: Contact & Security (The "Access")
-const contactSchema = z.object({
-  email: z.email('Invalid medical email address').optional().nullable(),
-  phone: z.string().min(10, 'Enter a valid phone number'),
-  password: z
-    .string()
-    .min(8, 'Security requires at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(
-      /[^A-Za-z0-9]/,
-      'Password must contain at least one special character'
-    ),
-})
+export const registrationSchema = z
+  .object({
+    firstName: z.string().trim().min(1, 'Enter your first name').max(100),
+    lastName: z.string().trim().min(1, 'Enter your last name').max(100),
+    email: z.email('Enter a valid email address').max(255),
+    phoneNumber: z
+      .string()
+      .trim()
+      .regex(
+        /^\+?[0-9]{10,15}$/,
+        'Enter a valid phone number, including country code'
+      ),
+    role: userRoleSchema,
+    password: z
+      .string()
+      .min(8, 'Use at least 8 characters')
+      .max(72, 'Password must be 72 characters or fewer')
+      .regex(/[A-Z]/, 'Add at least one uppercase letter')
+      .regex(/[a-z]/, 'Add at least one lowercase letter')
+      .regex(/[0-9]/, 'Add at least one number')
+      .regex(/[^A-Za-z0-9]/, 'Add at least one special character'),
+    confirmPassword: z.string().min(1, 'Confirm your password'),
+  })
+  .strict()
+  .refine((value) => value.password === value.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  })
 
-// Step 3: Clinical Baseline (The "Safety")
-const medicalSchema = z.object({
-  bloodGroup: z.string().min(1, 'Blood group is required for your Health ID'),
-  genotype: z.string().min(1, 'Genotype is required for your Health ID'),
-  allergies: z.string().optional(),
-  emergencyContactPhone: z
-    .string()
-    .min(10, 'Emergency contact phone is required'),
-  emergencyContactName: z.string().min(2, 'Emergency contact name is required'),
-})
-
-// The Final Master Schema
-export const registrationSchema = identitySchema
-  .extend(contactSchema.shape)
-  .extend(medicalSchema.shape)
 export type RegistrationValues = z.infer<typeof registrationSchema>
 
-export const bloodGroups = [
-  { label: 'A+', value: 'A+' },
-  { label: 'A-', value: 'A-' },
-  { label: 'B+', value: 'B+' },
-  { label: 'B-', value: 'B-' },
-  { label: 'O+', value: 'O+' },
-  { label: 'O-', value: 'O-' },
-  { label: 'AB+', value: 'AB+' },
-  { label: 'AB-', value: 'AB-' },
-]
-
-export const genotypes = [
-  { label: 'AA', value: 'AA' },
-  { label: 'AS', value: 'AS' },
-  { label: 'SS', value: 'SS' },
-  { label: 'AC', value: 'AC' },
-]
+export function getRegistrationPayload(values: RegistrationValues) {
+  return {
+    firstName: values.firstName,
+    lastName: values.lastName,
+    email: values.email,
+    phoneNumber: values.phoneNumber,
+    role: values.role,
+    password: values.password,
+  }
+}

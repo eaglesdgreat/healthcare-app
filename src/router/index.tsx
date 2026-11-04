@@ -1,20 +1,17 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { Suspense } from 'react'
 import PageLoader from '@/components/PageLoader'
+import ProtectedRoute from '@/components/ProtectedRoute'
 import AuthLayout from '@/layout/AuthLayout'
 import RootLayout from '@/layout/RootLayout'
+import ActivateAccount from '@/views/auths/ActivateAccount'
 import ForgetPassword from '@/views/auths/ForgetPassword'
 import LoginOption from '@/views/auths/LoginOption'
 import SignIn from '@/views/auths/SignIn'
 import SignUp from '@/views/auths/SignUp'
+import DashboardPage from '@/views/DashboardPage'
 import LandingPage from '@/views/LandingPage'
 import NotFoundPage from '@/views/NotFoundPage'
-
-// Lazy load pages for better performance
-// const LandingPage = lazy(() => import('@/views/LandingPage'))
-// const AboutPage = lazy(() => import('../pages/AboutPage'));
-// const ProductsPage = lazy(() => import('../pages/ProductsPage'));
-// const ProductDetailPage = lazy(() => import('../pages/ProductDetailPage'));
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +52,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'activate',
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <ActivateAccount />
+          </Suspense>
+        ),
+      },
+      {
         path: 'forget-password',
         element: (
           <Suspense fallback={<PageLoader />}>
@@ -87,8 +92,21 @@ export const router = createBrowserRouter([
   },
   {
     path: '/appointments',
-    element: <RootLayout />,
+    element: (
+      <ProtectedRoute>
+        <RootLayout />
+      </ProtectedRoute>
+    ),
     errorElement: <NotFoundPage />,
-    children: [],
+    children: [
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<PageLoader />}>
+            <DashboardPage />
+          </Suspense>
+        ),
+      },
+    ],
   },
 ])

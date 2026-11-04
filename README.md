@@ -1,73 +1,73 @@
-# React + TypeScript + Vite
+# Healthcare App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Responsive patient and provider-facing healthcare booking application built with React, TypeScript, and Vite. The current milestone implements the public authentication and account onboarding experience and is designed to communicate with backend services only through an API gateway.
 
-Currently, two official plugins are available:
+## Frontend flow and roadmap
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+See [DESIGN.md](./DESIGN.md) for the user journeys, screen flow, gateway contract, offline behavior, and phased product plan.
 
-## React Compiler
+### Current milestone
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Choose a Patient, Doctor, or Hospital account type.
+- Register with the fields accepted by the authentication service.
+- Activate a pending account with its Health ID and emailed token.
+- Sign in with an email, phone number, or Health ID.
+- Keep the public app shell available offline and clearly explain when network access is required.
+- Show a signed-in welcome page based on the authenticated profile.
 
-## Expanding the ESLint configuration
+Appointment discovery, appointment management, medical-record synchronization, password reset, and provider subscriptions are not represented as working features until their APIs are available.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Requirements
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js 22+
+- pnpm (the package manager used by this repository)
+- The healthcare API gateway, configured to route `/auth/*` requests to the auth microservice and strip the `/auth` prefix before forwarding. The auth NestJS controllers expose `/login`, `/signup`, `/activate`, `/refresh`, `/logout`, `/google`, and `/resend-activation` at their service root.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+The browser must never call internal microservice addresses directly. For local development, create an untracked `.env.local` file:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```dotenv
+# Same-origin gateway path (recommended) or an absolute gateway URL ending in /auth.
+VITE_API_BASE_URL=/auth
+VITE_API_GATEWAY_URL=http://localhost:8080
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+For local development, the Vite proxy forwards `/auth/*` to the gateway at `http://localhost:8080` by default. To use a different gateway address, set `VITE_API_GATEWAY_URL` in `.env.local`; this variable is read by the development server and is not embedded in client code. If the gateway is on another origin, set `VITE_API_BASE_URL` to that gateway's public origin and `/auth` route, and configure its CORS allowlist for the frontend origin. Do not put secrets in `VITE_*` variables.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Development
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install --frozen-lockfile
+pnpm dev
 ```
+
+## Checks
+
+```bash
+pnpm test
+pnpm build
+pnpm lint
+pnpm test:e2e
+```
+
+Build before running Playwright locally; the browser suite uses the production preview so it exercises the same service worker and asset caching as the container.
+
+## Container
+
+Build and run the static frontend container:
+
+```bash
+docker build --build-arg VITE_API_BASE_URL=/auth -t healthcare-app .
+docker run --rm -p 8080:80 healthcare-app
+```
+
+The container serves the SPA and service worker. Route `/auth/*` from the browser to the API gateway at the deployment ingress; do not expose auth microservices directly to the browser. Configure the API gateway's `/auth` prefix rewrite as described in [DESIGN.md](./DESIGN.md).
+
+## Testing
+
+- Vitest and Testing Library cover validation, API behavior, and interactive React flows.
+- Playwright covers registration/authentication, responsive layout, and offline status behavior.
+- GitHub Actions runs lint, unit/integration tests, production build, end-to-end tests, and a Docker build for pushes and pull requests to `main` and `master`.
+
+## Figma
+
+The supplied [Medical APP community design](https://www.figma.com/design/DhURQRAJVUA6XhUelK7VL2/Medical-APP--Community-?node-id=11-562) requires Figma access to inspect. The implementation follows the repository's existing Medical branding and responsive direction.

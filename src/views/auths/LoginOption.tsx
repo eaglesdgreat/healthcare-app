@@ -1,65 +1,77 @@
+import { ArrowRight, Building2, HeartPulse, Stethoscope } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import type { ReactNode } from 'react'
-import DoctorIcon from '@/assets/images/svgs/doctor.svg?react'
-import HospitalIcon from '@/assets/images/svgs/hospital.svg?react'
-import PatientIcon from '@/assets/images/svgs/patient.svg?react'
 import Title from '@/components/Title'
+import { userRoles } from '@/lib/signup.utils'
 
-interface Login {
-  icon: ReactNode
-  name: string
-  bgColor: string
-  textColor: string
-}
+const accountTypes = [
+  {
+    role: userRoles[0],
+    label: 'Patient',
+    description: 'Find care and manage your healthcare journey.',
+    icon: HeartPulse,
+  },
+  {
+    role: userRoles[1],
+    label: 'Doctor',
+    description: 'Connect with patients and manage your practice.',
+    icon: Stethoscope,
+  },
+  {
+    role: userRoles[2],
+    label: 'Hospital',
+    description: 'Bring your facility and care team online.',
+    icon: Building2,
+  },
+]
 
 export default function LoginOption() {
-  const loginOptions: Login[] = [
-    {
-      icon: <PatientIcon />,
-      name: 'Patient',
-      bgColor: 'bg-primary',
-      textColor: 'text-white',
-    },
-    {
-      icon: <DoctorIcon />,
-      name: 'Doctor',
-      bgColor: 'bg-secondary',
-      textColor: 'text-white',
-    },
-    {
-      icon: <HospitalIcon />,
-      name: 'Hospital',
-      bgColor: 'bg-secondary-2',
-      textColor: 'text-white',
-    },
-  ]
-
   return (
-    <div className="responsive flex flex-col gap-5 md:gap-10 justify-center items-center">
-      <Title animated className="font-normal!">
-        Medical
-      </Title>
+    <main className="container-custom flex min-h-screen flex-col justify-center py-12">
+      <Link
+        to="/"
+        className="mb-10 self-start text-sm text-text hover:text-white"
+      >
+        ← Back to home
+      </Link>
+      <div className="mx-auto w-full max-w-4xl">
+        <Title className="mb-4 text-4xl! sm:text-5xl!">
+          Welcome to Medical
+        </Title>
+        <p className="mb-9 text-text">
+          Choose how you use the platform to continue.
+        </p>
 
-      <p className="font-outfit font-medium text-3xl text-white">Login as a</p>
-
-      <div className="w-full flex justify-between items-center px-5">
-        {loginOptions.map((option, index) => (
-          <Link to={`/signin?type=${option.name.toLowerCase()}`} key={index}>
-            <div className="w-fit h-fit flex flex-col gap-2 justify-center items-center">
-              <div
-                className={`w-27 h-27 rounded-[50%] ${option.bgColor} grid place-items-center`}
-              >
-                {option.icon}
-              </div>
-              <p
-                className={`font-outfit font-medium text-1xl ${option.textColor}`}
-              >
-                {option.name}
+        <div className="grid gap-4 md:grid-cols-3">
+          {accountTypes.map(({ role, label, description, icon: Icon }) => (
+            <section
+              key={role}
+              className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-6"
+            >
+              <span className="grid size-12 place-items-center rounded-xl bg-primary/15 text-primary">
+                <Icon aria-hidden="true" />
+              </span>
+              <h2 className="mt-5 text-xl font-semibold text-white">{label}</h2>
+              <p className="mt-2 min-h-12 text-sm leading-6 text-text">
+                {description}
               </p>
-            </div>
-          </Link>
-        ))}
+              <div className="mt-6 grid gap-3">
+                <Link
+                  to={`/signin?type=${label.toLowerCase()}`}
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-title-gradient px-4 font-medium text-white transition hover:opacity-90"
+                >
+                  Sign in <ArrowRight size={16} aria-hidden="true" />
+                </Link>
+                <Link
+                  to={`/signup?type=${label.toLowerCase()}`}
+                  className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/15 px-4 text-sm text-white transition hover:border-primary"
+                >
+                  Create account
+                </Link>
+              </div>
+            </section>
+          ))}
+        </div>
       </div>
-    </div>
+    </main>
   )
 }
