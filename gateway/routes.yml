@@ -1,0 +1,26 @@
+http:
+  routers:
+    auth:
+      entryPoints:
+        - web
+      rule: 'Path(`/auth`) || PathPrefix(`/auth/`)'
+      middlewares:
+        - strip-auth-prefix
+      service: auth
+    users:
+      entryPoints:
+        - web
+      rule: 'Path(`/users`) || PathPrefix(`/users/`)'
+      service: auth
+
+  middlewares:
+    strip-auth-prefix:
+      stripPrefix:
+        prefixes:
+          - /auth
+
+  services:
+    auth:
+      loadBalancer:
+        servers:
+          - url: http://ms-auth-api:5501

@@ -1,4 +1,28 @@
 services:
+  api-gateway:
+    image: traefik:v3.3.6
+    container_name: healthcare-api-gateway
+    command:
+      - --api.dashboard=false
+      - --entrypoints.web.address=:80
+      - --ping=true
+      - --providers.file.filename=/etc/traefik/routes.yml
+      - --providers.file.watch=true
+    ports:
+      - '127.0.0.1:8080:80'
+    volumes:
+      - ./gateway/routes.yml:/etc/traefik/routes.yml:ro
+    networks:
+      healthcare-internal:
+        aliases:
+          - api-gateway
+    healthcheck:
+      test: ['CMD', 'traefik', 'healthcheck', '--ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
   healthcare-frontend:
     container_name: healthcare-frontend
     build:
@@ -12,10 +36,15 @@ services:
     environment:
       NODE_ENV: development
       VITE_API_BASE_URL: /auth
-      VITE_API_GATEWAY_URL: ${VITE_API_GATEWAY_URL:-http://host.docker.internal:8080}
+      VITE_API_GATEWAY_URL: http://api-gateway
       CHOKIDAR_USEPOLLING: 'true'
       CHOKIDAR_INTERVAL: '1000'
       WATCHPACK_POLLING: 'true'
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+    networks:
+      - healthcare-internal
     restart: unless-stopped
+
+networks:
+  healthcare-internal:
+    external: true
+    name: healthcare-internal
