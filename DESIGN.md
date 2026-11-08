@@ -43,7 +43,9 @@ Any screen ── Connectivity lost ── Offline banner + cached public app sh
 
 ## API gateway integration
 
-The frontend talks only to the API gateway. Configure `VITE_API_BASE_URL` as a same-origin `/auth` path or a public gateway origin ending in `/auth`. The current auth service controller methods are rooted at `/login`, `/signup`, `/activate`, `/refresh`, `/logout`, `/google`, and `/resend-activation`. Consequently, the gateway must match public `/auth/*` traffic, remove the `/auth` prefix, and forward the remaining path to the auth service. The gateway must also allow the frontend origin when cross-origin deployment is used.
+The frontend talks only to the API gateway. Configure `VITE_API_BASE_URL` as a same-origin `/auth` path. The current auth service controller methods are rooted at `/login`, `/signup`, `/activate`, `/refresh`, `/logout`, `/google`, and `/resend-activation`. Consequently, the gateway matches `/auth/*`, removes the `/auth` prefix, and forwards the remaining path to the auth service. The `/users/*` route is forwarded unchanged to the same service. In production, serve the SPA and gateway API routes on the same origin; if they must use separate origins, configure a strict CORS allowlist at the ingress and backend.
+
+The local Traefik gateway is defined in `docker-compose.yml` and `gateway/routes.yml`. It is bound to `127.0.0.1:8080` and attached to the private `healthcare-internal` Docker network. Only Auth routes are published to browser clients. Notification's API-key-protected service endpoints and Observability's metrics, health, and administrative endpoints are intentionally not public gateway routes.
 
 | Frontend operation | Gateway request                | Request body                                                  | Successful response                                   |
 | ------------------ | ------------------------------ | ------------------------------------------------------------- | ----------------------------------------------------- |
@@ -55,6 +57,13 @@ The frontend talks only to the API gateway. Configure `VITE_API_BASE_URL` as a s
 | Sign out           | `POST /auth/logout`            | `{ refreshToken }`                                            | `{ message }`                                         |
 
 Auth failures use the backend's structured exception response and may include a `requestId`; retain that ID in user-facing support diagnostics without exposing tokens or passwords.
+
+## Development and delivery workflow
+
+- The Docker Compose development service builds the `development` target and runs Vite with a bind-mounted source tree and a container-managed `node_modules` volume for hot reload. Its `/auth` proxy targets the gateway at `http://api-gateway` on the shared Docker network. When Vite runs directly on the host, the proxy defaults to `http://localhost:8080`; override `VITE_API_GATEWAY_URL` when needed.
+- The production image uses a separate build stage to compile the static frontend, then serves the bundle and SPA routes from Nginx. `VITE_API_BASE_URL` is a build-time public setting, not a place for secrets.
+- The Makefile provides common development, check, and release-image commands. The GitHub Actions workflow runs TypeScript checks for both application and Vite configuration, lint, unit/component and browser tests, Compose validation, and a production image build.
+- Production and development use different container targets: local Compose is for the Vite development server; the release image is the Nginx static site. The API gateway remains an independently deployed service.
 
 ## Offline and privacy behavior
 
